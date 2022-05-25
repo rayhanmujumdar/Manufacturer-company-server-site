@@ -24,7 +24,7 @@ const client = new MongoClient(uri, {
     serverApi: ServerApiVersion.v1
 });
 
-// verify token
+// jwt verify token
 const verifyToken = (req, res, next) => {
     const authHeader = req.headers.authorization
     const token = authHeader && authHeader.split(' ')[1]
@@ -51,7 +51,7 @@ const run = async () => {
         const orderCollection = client.db("Manufacturer").collection('order')
         const userCollection = client.db("Manufacturer").collection('user')
         const reviewsCollection = client.db("Manufacturer").collection('reviews')
-        // user collection
+        // user collection api
         app.put('/user/:email', async (req, res) => {
             const email = req.params.email
             const user = req.body
@@ -76,13 +76,13 @@ const run = async () => {
             })
         })
 
-        // all product
+        // all product api
         app.get('/product', async (req, res) => {
             const query = res.query
             const result = (await productCollection.find(query).toArray()).reverse()
             res.send(result)
         })
-        // find a single product
+        // find a single product api
         app.get('/product/:id', verifyToken, async (req, res) => {
             const decoded = req.decoded.email
             const email = req.query.email
@@ -96,7 +96,7 @@ const run = async () => {
             }
         })
 
-        // order post data
+        // order post data api
 
         app.post('/productOrder',verifyToken, async (req, res) => {
             const orderData = req.body
@@ -104,7 +104,7 @@ const run = async () => {
             res.send(result)
         })
 
-        // update quantity
+        // update quantity api
 
         app.put('/product/:id',verifyToken, async (req, res) => {
             const id = req.params.id
@@ -124,25 +124,25 @@ const run = async () => {
             res.send(result)
         })
 
-        // home section review collection
+        // home section review collection api
         app.get('/homeReview', async(req,res) => {
             const query = req.query
             const result = (await reviewsCollection.find(query).toArray()).reverse()
             res.send(result);
         })
-        // all reviews data
+        // all reviews data api
         app.get('/allReviews',verifyToken, async(req,res) => {
             const query = req.query
             const result = (await reviewsCollection.find(query).toArray()).reverse();
             res.send(result);
         })
-        // dashboard all orders
+        // dashboard all orders api
         app.get("/orders",verifyToken, async(req,res) => {
             const email = req.query.email
             const result = await orderCollection.find({email:email}).toArray()
             res.send(result)
         })
-        // cancel product
+        // cancel product api
         app.delete('/deleteOrder/:id',verifyToken,async (req,res) => {
             const id = req.params.id
             console.log(id)
@@ -150,13 +150,36 @@ const run = async () => {
             const result = await orderCollection.deleteOne(filter)
             res.send(result)
         })
-        // add reviews
+        // add reviews api
         app.post('/addReview',verifyToken,async(req,res) => {
             const review = req.body
             const result = await reviewsCollection.insertOne(review)
             console.log(result)
             res.send(result)
         })
+        // Add a new Product api
+        app.post('/addProduct',verifyToken,async(req,res) => {
+            const productData = req.body
+            const email = req.query.email
+            const decoded = req.decoded.email
+            if(email === decoded){
+                const result = await productCollection.insertOne(productData)
+                res.send(result)
+            }else{
+                res.send({message: 'forbidden'})
+            }
+        })
+
+        // manage product api
+        app.get('/manageProduct',verifyToken,async(req,res) => {
+            const email = req.query.email
+            const decoded = req.decoded.email
+            const result = (await productCollection.find({}).toArray()).reverse()
+            res.send(result)
+        })
+
+        // update product api
+        
     } finally {
 
     }
@@ -164,7 +187,7 @@ const run = async () => {
 run().catch(console.dir)
 
 app.get('/', (req, res) => {
-    res.send('o bhaiya all is ok')
+    res.send('response ok')
 })
 
 app.listen(port, () => {
