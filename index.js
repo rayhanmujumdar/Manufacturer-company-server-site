@@ -79,7 +79,7 @@ const run = async () => {
         // all product
         app.get('/product', async (req, res) => {
             const query = res.query
-            const result = await productCollection.find(query).toArray()
+            const result = (await productCollection.find(query).toArray()).reverse()
             res.send(result)
         })
         // find a single product
@@ -127,17 +127,36 @@ const run = async () => {
         // home section review collection
         app.get('/homeReview', async(req,res) => {
             const query = req.query
-            const result = await reviewsCollection.find(query).limit(3).toArray();
+            const result = (await reviewsCollection.find(query).toArray()).reverse()
             res.send(result);
         })
-        // find all reviews
-        app.get('/allReviews', async(req,res) => {
+        // all reviews data
+        app.get('/allReviews',verifyToken, async(req,res) => {
             const query = req.query
-            const result = await reviewsCollection.find(query).toArray();
+            const result = (await reviewsCollection.find(query).toArray()).reverse();
             res.send(result);
         })
         // dashboard all orders
-        app.get
+        app.get("/orders",verifyToken, async(req,res) => {
+            const email = req.query.email
+            const result = await orderCollection.find({email:email}).toArray()
+            res.send(result)
+        })
+        // cancel product
+        app.delete('/deleteOrder/:id',verifyToken,async (req,res) => {
+            const id = req.params.id
+            console.log(id)
+            const filter = {_id: ObjectId(id)}
+            const result = await orderCollection.deleteOne(filter)
+            res.send(result)
+        })
+        // add reviews
+        app.post('/addReview',verifyToken,async(req,res) => {
+            const review = req.body
+            const result = await reviewsCollection.insertOne(review)
+            console.log(result)
+            res.send(result)
+        })
     } finally {
 
     }
