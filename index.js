@@ -50,6 +50,7 @@ const run = async () => {
         const productCollection = client.db("Manufacturer").collection('product')
         const orderCollection = client.db("Manufacturer").collection('order')
         const userCollection = client.db("Manufacturer").collection('user')
+        const reviewsCollection = client.db("Manufacturer").collection('reviews')
         // user collection
         app.put('/user/:email', async (req, res) => {
             const email = req.params.email
@@ -122,6 +123,21 @@ const run = async () => {
             const result = await productCollection.updateOne(filter, updateDoc, options)
             res.send(result)
         })
+
+        // home section review collection
+        app.get('/homeReview', async(req,res) => {
+            const query = req.query
+            const result = await reviewsCollection.find(query).limit(3).toArray();
+            res.send(result);
+        })
+        // find all reviews
+        app.get('/allReviews', async(req,res) => {
+            const query = req.query
+            const result = await reviewsCollection.find(query).toArray();
+            res.send(result);
+        })
+        // dashboard all orders
+        app.get
     } finally {
 
     }
