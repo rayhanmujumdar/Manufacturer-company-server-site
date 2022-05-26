@@ -257,7 +257,7 @@ const run = async () => {
                 res.status(403).send({message: 'forbidden'})
             }
         })
-        // admin email get
+        // admin email get api
         app.get('/admin/:email',verifyToken,async(req,res) => {
             const email = req.params.email
             const decoded = req.decoded.email
@@ -265,6 +265,22 @@ const run = async () => {
                 const user = await userCollection.findOne({email: email})
                 const isAdmin = user?.role === 'admin'
                 res.send({admin: isAdmin})
+            }else{
+                res.status(403).send({message: 'forbidden'})
+            }
+        })
+        // deleted admin api
+        app.put('/deleteAdmin/:email',verifyToken,verifyAdmin,async(req,res) => {
+            const authEmail = req.body.email
+            const decoded = req.decoded.email
+            if(authEmail === decoded){
+                const email = req.params.email
+                const filter = {email: email}
+                const updateDoc = {
+                    $set: {role: null}
+                };
+                const result = await userCollection.updateOne(filter,updateDoc)
+                res.send(result)
             }else{
                 res.status(403).send({message: 'forbidden'})
             }
