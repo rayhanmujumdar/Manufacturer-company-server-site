@@ -169,10 +169,13 @@ const run = async () => {
         })
         // add reviews api
         app.post('/addReview', verifyToken, async (req, res) => {
-            const review = req.body
-            const result = await reviewsCollection.insertOne(review)
-            console.log(result)
-            res.send(result)
+            const decoded = req.decoded.email
+            const email = req.query.email
+            if(decoded === email){
+                const review = req.body
+                const result = await reviewsCollection.insertOne(review)
+                res.send(result)
+            }
         })
         // Add a new Product api
         app.post('/addProduct', verifyToken, async (req, res) => {
@@ -183,7 +186,7 @@ const run = async () => {
                 const result = await productCollection.insertOne(productData)
                 res.send(result)
             } else {
-                res.send({
+                res.status(403).send({
                     message: 'forbidden'
                 })
             }
@@ -196,6 +199,8 @@ const run = async () => {
             if (email === decoded) {
                 const result = (await productCollection.find({}).toArray()).reverse()
                 res.send(result)
+            }else{
+                res.status(403).send({message: 'forbidden'})
             }
         })
 
@@ -218,6 +223,8 @@ const run = async () => {
                 }
                 const result = await productCollection.updateOne(filter, updateDoc, options)
                 res.send(result)
+            }else{
+                res.status(403).send({message: 'forbidden'})
             }
         })
 
@@ -228,26 +235,38 @@ const run = async () => {
             if(email === decoded){
                 const result = (await userCollection.find({}).toArray()).reverse()
                 res.send(result)
+            }else{
+                res.status(403).send({message: 'forbidden'})
             }
         })
 
         // Make a admin api
         app.put('/user/admin/:email',verifyToken,verifyAdmin,async(req,res) => {
             const email = req.params.email
-            const filter = {email: email}
-            const updateDoc = {
-                $set: {role : 'admin'}
+            const decoded = req.decoded.email
+            if(email === decoded){
+                const filter = {email: email}
+                const updateDoc = {
+                    $set: {role : 'admin'}
+                }
+                console.log(email)
+                const result = await userCollection.updateOne(filter,updateDoc)
+                res.send(result)
+            }else{
+                res.status(403).send({message: 'forbidden'})
             }
-            console.log(email)
-            const result = await userCollection.updateOne(filter,updateDoc)
-            res.send(result)
         })
         // admin email get
-        app.get('/admin/:email',async(req,res) => {
+        app.get('/admin/:email',verifyToken,async(req,res) => {
             const email = req.params.email
-            const user = await userCollection.findOne({email: email})
-            const isAdmin = user?.role === 'admin'
-            res.send({admin: isAdmin})
+            const decoded = req.decoded.email
+            if(email === decoded){
+                const user = await userCollection.findOne({email: email})
+                const isAdmin = user?.role === 'admin'
+                res.send({admin: isAdmin})
+            }else{
+                res.status(403).send({message: 'forbidden'})
+            }
         })
     } finally {
 
