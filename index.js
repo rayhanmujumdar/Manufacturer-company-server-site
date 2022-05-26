@@ -242,14 +242,15 @@ const run = async () => {
 
         // Make a admin api
         app.put('/user/admin/:email',verifyToken,verifyAdmin,async(req,res) => {
-            const email = req.params.email
+            const makeAdminEmail = req.params.email
             const decoded = req.decoded.email
+            const email = req.body.email
             if(email === decoded){
-                const filter = {email: email}
+                const filter = {email: makeAdminEmail}
+                console.log(filter)
                 const updateDoc = {
                     $set: {role : 'admin'}
                 }
-                console.log(email)
                 const result = await userCollection.updateOne(filter,updateDoc)
                 res.send(result)
             }else{
