@@ -51,6 +51,19 @@ const run = async () => {
         const orderCollection = client.db("Manufacturer").collection('order')
         const userCollection = client.db("Manufacturer").collection('user')
         const reviewsCollection = client.db("Manufacturer").collection('reviews')
+
+
+        // verify admin or not
+        const verifyAdmin = async (req,res,next) => {
+            const requester = req.decoded.email
+            const requesterAccount = await userCollection.findOne({email: requester})
+            if(requesterAccount.role === "admin"){
+                next()
+            }else{
+                res.status(403).send({message: "forbidden"})
+            }
+        }
+
         // user collection api
         app.put('/user/:email', async (req, res) => {
             const email = req.params.email
@@ -98,7 +111,7 @@ const run = async () => {
 
         // order post data api
 
-        app.post('/productOrder',verifyToken, async (req, res) => {
+        app.post('/productOrder', verifyToken, async (req, res) => {
             const orderData = req.body
             const result = await orderCollection.insertOne(orderData)
             res.send(result)
@@ -106,7 +119,7 @@ const run = async () => {
 
         // update quantity api
 
-        app.put('/product/:id',verifyToken, async (req, res) => {
+        app.put('/product/:id', verifyToken, async (req, res) => {
             const id = req.params.id
             const availableQuantity = req.body.quantity
             const options = {
@@ -125,61 +138,98 @@ const run = async () => {
         })
 
         // home section review collection api
-        app.get('/homeReview', async(req,res) => {
+        app.get('/homeReview', async (req, res) => {
             const query = req.query
             const result = (await reviewsCollection.find(query).toArray()).reverse()
             res.send(result);
         })
         // all reviews data api
-        app.get('/allReviews',verifyToken, async(req,res) => {
+        app.get('/allReviews', verifyToken, async (req, res) => {
             const query = req.query
             const result = (await reviewsCollection.find(query).toArray()).reverse();
             res.send(result);
         })
         // dashboard all orders api
-        app.get("/orders",verifyToken, async(req,res) => {
+        app.get("/orders", verifyToken, async (req, res) => {
             const email = req.query.email
-            const result = await orderCollection.find({email:email}).toArray()
+            const result = await orderCollection.find({
+                email: email
+            }).toArray()
             res.send(result)
         })
         // cancel product api
-        app.delete('/deleteOrder/:id',verifyToken,async (req,res) => {
+        app.delete('/deleteOrder/:id', verifyToken, async (req, res) => {
             const id = req.params.id
             console.log(id)
-            const filter = {_id: ObjectId(id)}
+            const filter = {
+                _id: ObjectId(id)
+            }
             const result = await orderCollection.deleteOne(filter)
             res.send(result)
         })
         // add reviews api
-        app.post('/addReview',verifyToken,async(req,res) => {
+        app.post('/addReview', verifyToken, async (req, res) => {
             const review = req.body
             const result = await reviewsCollection.insertOne(review)
             console.log(result)
             res.send(result)
         })
         // Add a new Product api
-        app.post('/addProduct',verifyToken,async(req,res) => {
+        app.post('/addProduct', verifyToken, async (req, res) => {
             const productData = req.body
             const email = req.query.email
             const decoded = req.decoded.email
-            if(email === decoded){
+            if (email === decoded) {
                 const result = await productCollection.insertOne(productData)
                 res.send(result)
-            }else{
-                res.send({message: 'forbidden'})
+            } else {
+                res.send({
+                    message: 'forbidden'
+                })
             }
         })
 
         // manage product api
-        app.get('/manageProduct',verifyToken,async(req,res) => {
+        app.get('/manageProduct', verifyToken, async (req, res) => {
             const email = req.query.email
             const decoded = req.decoded.email
-            const result = (await productCollection.find({}).toArray()).reverse()
-            res.send(result)
+            if (email === decoded) {
+                const result = (await productCollection.find({}).toArray()).reverse()
+                res.send(result)
+            }
         })
 
         // update product api
-        
+        app.put('/updateProduct/:id', verifyToken, async (req, res) => {
+            const id = req.params.id
+            const email = req.query.email
+            const decoded = req.decoded.email
+            const updateProduct = req.body
+            console.log(updateProduct)
+            if (email === decoded) {
+                const filter = {
+                    _id: ObjectId(id)
+                }
+                const options = {
+                    upsert: true
+                };
+                const updateDoc = {
+                    $set: updateProduct
+                }
+                const result = await productCollection.updateOne(filter, updateDoc, options)
+                res.send(result)
+            }
+        })
+
+        // find a all users
+        app.get('/user',verifyToken,async(req,res) => {
+            const email = req.query.email
+            const decoded = req.decoded.email
+            if(email === decoded){
+                const result = (await userCollection.find({}).toArray()).reverse()
+                res.send(result)
+            }
+        })
     } finally {
 
     }
