@@ -221,7 +221,7 @@ const run = async () => {
             }
         })
 
-        // find a all users
+        // find a all users api
         app.get('/user',verifyToken,async(req,res) => {
             const email = req.query.email
             const decoded = req.decoded.email
@@ -230,6 +230,19 @@ const run = async () => {
                 res.send(result)
             }
         })
+
+        // Make a admin api
+        app.put('/user/admin/:email',async(req,res) => {
+            const email = req.params.email
+            const filter = {email: email}
+            const updateDoc = {
+                $set: {role : 'admin'}
+            }
+            console.log(email)
+            const result = await userCollection.updateOne(filter,updateDoc)
+            res.send(result)
+        })
+        // admin email get
     } finally {
 
     }
