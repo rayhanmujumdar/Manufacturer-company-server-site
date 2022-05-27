@@ -186,7 +186,7 @@ const run = async () => {
         // dashboard all orders api
         app.get("/orders", verifyToken, async (req, res) => {
             const query = req.query
-            const result = await orderCollection.find(query).toArray()
+            const result = (await orderCollection.find(query).toArray()).reverse()
             console.log(result)
             res.send(result)
         })
