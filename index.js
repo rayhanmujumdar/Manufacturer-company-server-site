@@ -50,6 +50,7 @@ const run = async () => {
         await client.connect()
         const productCollection = client.db("Manufacturer").collection('product')
         const orderCollection = client.db("Manufacturer").collection('order')
+        const paymentCollection = client.db("Manufacturer").collection('payment')
         const userCollection = client.db("Manufacturer").collection('user')
         const reviewsCollection = client.db("Manufacturer").collection('reviews')
 
@@ -69,7 +70,6 @@ const run = async () => {
         app.post("/create-payment-intent",verifyToken, async (req,res) => {
             const {price} = req.body
             const amount = price * 100
-            console.log(amount)
             const paymentIntent = await stripe?.paymentIntents.create({
                 amount: amount,
                 currency: 'usd',
@@ -179,19 +179,33 @@ const run = async () => {
         })
         // dashboard all orders api
         app.get("/orders", verifyToken, async (req, res) => {
-            const email = req.query.email
-            const result = await orderCollection.find({
-                email: email
-            }).toArray()
+            const query = req.query
+            const result = await orderCollection.find(query).toArray()
+            console.log(result)
             res.send(result)
         })
-
         // ordered single data api
         app.get('/orders/:id',verifyToken,async(req,res) => {
             const id = req.params.id
             const filter = {_id: ObjectId(id)}
             const result = await orderCollection.findOne(filter)
             res.send(result)
+        })
+        // order payment update
+        app.patch('/orderPayment/:id',verifyToken,async(req,res) => {
+            const id = req.params.id
+            const payment = req.body
+            const  filter = {_id: ObjectId(id)}
+            console.log(payment)
+            const updateDoc = {
+                $set: {
+                    paid: true,
+                    transactionId: payment?.transactionId
+                }
+            }
+            const result = await paymentCollection.insertOne(payment);
+            const updateOrder = await orderCollection.updateOne(filter,updateDoc)
+            res.send(updateOrder)
         })
 
         // cancel product api
