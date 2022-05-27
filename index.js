@@ -4,6 +4,7 @@ const cors = require('cors')
 require('dotenv').config()
 const port = process.env.PORT || 5000
 const jwt = require('jsonwebtoken');
+const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY)
 
 // middleware
 app.use(cors())
@@ -64,6 +65,21 @@ const run = async () => {
             }
         }
 
+        // Stripe Payment gat way
+        app.post("/create-payment-intent",verifyToken, async (req,res) => {
+            const {price} = req.body
+            const amount = price * 100
+            console.log(amount)
+            const paymentIntent = await stripe?.paymentIntents.create({
+                amount: amount,
+                currency: 'usd',
+                payment_method_types: ["card"]
+            });
+            res.send({
+                clientSecret: paymentIntent.client_secret
+            })
+        })
+
         // user collection api
         app.put('/user/:email', async (req, res) => {
             const email = req.params.email
@@ -87,6 +103,18 @@ const run = async () => {
                 token,
                 result
             })
+        })
+
+        // find a all users api
+        app.get('/user',verifyToken,async(req,res) => {
+            const email = req.query.email
+            const decoded = req.decoded.email
+            if(email === decoded){
+                const result = (await userCollection.find({}).toArray()).reverse()
+                res.send(result)
+            }else{
+                res.status(403).send({message: 'forbidden'})
+            }
         })
 
         // all product api
@@ -157,6 +185,15 @@ const run = async () => {
             }).toArray()
             res.send(result)
         })
+
+        // ordered single data api
+        app.get('/orders/:id',verifyToken,async(req,res) => {
+            const id = req.params.id
+            const filter = {_id: ObjectId(id)}
+            const result = await orderCollection.findOne(filter)
+            res.send(result)
+        })
+
         // cancel product api
         app.delete('/deleteOrder/:id', verifyToken, async (req, res) => {
             const id = req.params.id
@@ -222,18 +259,6 @@ const run = async () => {
                     $set: updateProduct
                 }
                 const result = await productCollection.updateOne(filter, updateDoc, options)
-                res.send(result)
-            }else{
-                res.status(403).send({message: 'forbidden'})
-            }
-        })
-
-        // find a all users api
-        app.get('/user',verifyToken,async(req,res) => {
-            const email = req.query.email
-            const decoded = req.decoded.email
-            if(email === decoded){
-                const result = (await userCollection.find({}).toArray()).reverse()
                 res.send(result)
             }else{
                 res.status(403).send({message: 'forbidden'})
