@@ -164,7 +164,13 @@ const run = async () => {
             const result = await productCollection.updateOne(filter, updateDoc, options)
             res.send(result)
         })
-
+        // delete product api
+        app.delete('/deleteProduct/:id',verifyToken,verifyAdmin,async(req,res) => {
+            const id = req.params.id
+            const query = {_id: ObjectId(id)}
+            const result = await productCollection.deleteOne(query)
+            res.send(result)
+        })
         // home section review collection api
         app.get('/homeReview', async (req, res) => {
             const query = req.query
@@ -196,7 +202,6 @@ const run = async () => {
             const id = req.params.id
             const payment = req.body
             const  filter = {_id: ObjectId(id)}
-            console.log(payment)
             const updateDoc = {
                 $set: {
                     paid: true,
@@ -207,7 +212,16 @@ const run = async () => {
             const updateOrder = await orderCollection.updateOne(filter,updateDoc)
             res.send(updateOrder)
         })
-
+        // shipping orders api
+        app.patch('/orderShipping/:id',verifyToken,verifyAdmin,async(req,res) => {
+            const id = req.params.id
+            const filter = {_id: ObjectId(id)}
+            const updateDoc = {
+                $set: {delivery: true}
+            }
+            const result = await orderCollection.updateOne(filter,updateDoc)
+            res.send(result)
+        })
         // cancel product api
         app.delete('/deleteOrder/:id', verifyToken, async (req, res) => {
             const id = req.params.id
