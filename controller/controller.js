@@ -7,7 +7,7 @@ const stripe = require("stripe")(process.env.PAYMENT_SECRET_KEY);
 exports.singleProductController = async (req, res) => {
   const { productCollection } = await dbCollection();
   const decoded = req?.decoded?.email;
-  console.log(decoded)
+  console.log(decoded);
   const email = req?.query?.email;
   if (email === decoded) {
     const params = req.params.id;
