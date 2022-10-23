@@ -24,7 +24,7 @@ exports.verifyToken = (req, res, next) => {
 // verify admin or not
 exports.verifyAdmin = async (req, res, next) => {
   const { userCollection } = await dbCollection();
-  const requester = req.decoded.email;
+  const requester = req?.decoded?.email;
   const requesterAccount = await userCollection.findOne({
     email: requester,
   });

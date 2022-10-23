@@ -157,7 +157,8 @@ exports.orderPaymentUpdateController = async (req, res) => {
 // shipping orders api
 exports.shippingOrdersController = async (req, res) => {
   const { orderCollection } = await dbCollection();
-  const id = req.params.id;
+  const id = req?.params?.id;
+  console.log(id)
   const filter = { _id: ObjectId(id) };
   const updateDoc = {
     $set: { delivery: true },
