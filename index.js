@@ -6,12 +6,9 @@ const stripe = require("stripe")(process.env.PAYMENT_SECRET_KEY);
 const dbConnect = require("./utilits/db");
 const app = require('./app/app')
 
-const globalMiddleware = require("./middleware/global.middleware");
+
 const { verifyToken } = require("./middleware/custom.middleware");
 const { ObjectId } = require("mongodb");
-
-// all middleware
-app.use(globalMiddleware);
 
 // heroku deploy
 // https://fast-river-13040.herokuapp.com/
@@ -19,6 +16,7 @@ app.use(globalMiddleware);
 // Database connection
 const client = dbConnect();
 
+// express server
 const server = http.createServer(app);
 
 const run = async () => {
