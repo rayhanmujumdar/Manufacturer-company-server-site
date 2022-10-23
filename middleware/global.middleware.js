@@ -1,10 +1,11 @@
-const status = require('../routes/v1/health')
 const cors = require('cors')
 const express = require('express')
+const morgan = require('morgan')
 const middleware = [
-    status,
     cors(),
-    express.json()
+    express.json(),
+    morgan('dev'),
+    express.urlencoded({extended: true})
 ]
 
 module.exports = middleware
