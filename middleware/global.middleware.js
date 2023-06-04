@@ -5,7 +5,7 @@ const middleware = [
     cors(),
     express.json(),
     morgan('dev'),
-    express.urlencoded({extended: true})
+    // express.urlencoded({extended: true})
 ]
 
 module.exports = middleware

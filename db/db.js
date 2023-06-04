@@ -6,7 +6,7 @@ function dbClient() {
     useUnifiedTopology: true,
     serverApi: ServerApiVersion.v1,
   });
-  return client
+  return client;
 }
 
 module.exports = dbClient();

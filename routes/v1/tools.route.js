@@ -64,7 +64,8 @@ router.get("/orders/:id", verifyToken, getSingleOrderController);
 // order payment update
 router.patch("/orderPayment/:id", verifyToken, orderPaymentUpdateController);
 // shipping orders api
-router.patch("/orderShipping/:id",
+router.patch(
+  "/orderShipping/:id",
   verifyToken,
   verifyAdmin,
   shippingOrdersController
