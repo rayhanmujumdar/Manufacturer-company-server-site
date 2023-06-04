@@ -4,7 +4,7 @@ const port = process.env.PORT || 5000;
 const app = require("./app/app");
 
 // vercel deploy
-// https://assignment-12-manufacturer-company-server-site.vercel.app/api/v1/tools
+// https://assignment-12-manufacturer-company-server-site-8j7uu5jff.vercel.app//api/v1/tools
 // http://localhost:5000/api/v1/tools
 
 // express server
