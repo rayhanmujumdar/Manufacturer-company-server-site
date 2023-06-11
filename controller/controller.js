@@ -1,13 +1,14 @@
 const { ObjectId } = require("mongodb");
 const dbCollection = require("../db/dbCollection");
 const jwt = require("jsonwebtoken");
+const sendOrderMail = require("../utilits/sendOrderMail");
+const nodemailerTransporter = require("../utilits/nodemailer");
 const stripe = require("stripe")(process.env.PAYMENT_SECRET_KEY);
 
 // find a single product api controller
 exports.singleProductController = async (req, res) => {
   const { productCollection } = await dbCollection();
   const decoded = req?.decoded?.email;
-  console.log(decoded);
   const email = req?.query?.email;
   if (email === decoded) {
     const params = req.params.id;
@@ -74,10 +75,26 @@ exports.getAllProductController = async (req, res) => {
 };
 
 exports.getOrderProductController = async (req, res) => {
-  const { orderCollection } = await dbCollection();
-  const orderData = req.body;
-  const result = await orderCollection.insertOne(orderData);
-  res.send(result);
+  try {
+    const { orderCollection } = await dbCollection();
+    const orderData = req.body;
+    const result = await orderCollection.insertOne(orderData);
+    // send order mail function
+    if (result?.acknowledged) {
+      const mailOptions = sendOrderMail(orderData);
+      const transporter = nodemailerTransporter();
+      transporter.sendMail(mailOptions, (err, info) => {
+        if (err) {
+          console.log(err);
+        } else {
+          // console.log(info);
+        }
+      });
+    }
+    res.send(result);
+  } catch (err) {
+    // console.log(err.message);
+  }
 };
 // update quantity api
 exports.getUpdateQuantityController = async (req, res) => {
@@ -158,7 +175,6 @@ exports.orderPaymentUpdateController = async (req, res) => {
 exports.shippingOrdersController = async (req, res) => {
   const { orderCollection } = await dbCollection();
   const id = req?.params?.id;
-  console.log(id)
   const filter = { _id: ObjectId(id) };
   const updateDoc = {
     $set: { delivery: true },
@@ -170,7 +186,6 @@ exports.shippingOrdersController = async (req, res) => {
 exports.deleteProductController = async (req, res) => {
   const { orderCollection } = await dbCollection();
   const id = req.params.id;
-  console.log(id);
   const filter = {
     _id: ObjectId(id),
   };
@@ -254,7 +269,6 @@ exports.adminCreateController = async (req, res) => {
   const email = req.body.email;
   if (email === decoded) {
     const filter = { email: makeAdminEmail };
-    console.log(filter);
     const updateDoc = {
       $set: { role: "admin" },
     };
