@@ -31,17 +31,24 @@ const {
 
 // * user and admin api
 // user collection api
-router.put("/user/:email", userCollectionController);
+router.put("/user/:email", verifyToken,userCollectionController);
 // find all user api
 router.get("/user", verifyToken, findAllUserController);
 // admin email get api
-router.get("/admin/:email", verifyToken, getAdminEmailController);
+router.get("/user/admin/:email", verifyToken, getAdminEmailController);
 // Make a admin api
 router.put(
   "/user/admin/:email",
   verifyToken,
   verifyAdmin,
   adminCreateController
+);
+// update and add new admin admin api
+router.put(
+  "/deleteAdmin/:email",
+  verifyToken,
+  verifyAdmin,
+  deleteAdminController
 );
 
 // * payment api
@@ -72,13 +79,7 @@ router.patch(
 );
 
 // * Delete Api
-// deleted admin api
-router.put(
-  "/deleteAdmin/:email",
-  verifyToken,
-  verifyAdmin,
-  deleteAdminController
-);
+
 // delete product api
 router.delete(
   "/deleteProduct/:id",
