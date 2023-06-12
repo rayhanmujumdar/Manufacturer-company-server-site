@@ -13,7 +13,7 @@ const {
 
 // * user and admin api
 // user collection api
-router.put("/:email", verifyToken, userCollectionController);
+router.put("/:email", userCollectionController);
 // find all user api
 router.get("/", verifyToken, findAllUserController);
 // admin email get api

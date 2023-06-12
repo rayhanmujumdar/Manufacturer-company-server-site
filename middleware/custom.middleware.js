@@ -10,6 +10,7 @@ exports.verifyToken = (req, res, next) => {
       massage: "Unauthorized",
     });
   }
+  // console.log(authHeader)
   jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
     if (err) {
       return res.status(403).send({

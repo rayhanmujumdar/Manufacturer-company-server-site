@@ -28,6 +28,7 @@ exports.singleProductController = async (req, res) => {
 exports.userCollectionController = async (req, res) => {
   const { userCollection } = await dbCollection();
   const email = req.params.email;
+  console.log({email})
   const user = req.body;
   const filter = {
     email: email,

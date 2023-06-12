@@ -13,11 +13,11 @@ const {
   verifyToken,
 } = require("../../middleware/custom.middleware");
 
-// Add a new Product api
-//TODO: previous path -> /addProduct - POST
 router
   .route("/")
   .get(getAllProductController)
+  // Add a new Product api
+  //TODO: previous path -> /addProduct - POST
   .post(verifyToken, newProductController);
 // manage product api
 // TODO: /product or /manageProduct are similar just one different is verifyToken.
@@ -28,26 +28,26 @@ router.put("/updateProduct/:id", verifyToken, updateProductController);
 // find a single product api controller
 router
   .route("/:id")
-  /**
-   * @api {get} /tools All tools
-   * @apiDescription get all the tools
-   * @apiPermission admin
+  /** use JSDOC API documentation generator
+   * @api {get} /:id
+   * @apiDescription get a single product api
+   * @apiPermission auth user
    *
    * @apiHeader {String} Authorization user's access token
    *
    * @apiParam
    * @apiParam
    *
-   * @apiSuccess
+   * @apiSuccess 200 status code is api success
    *
    * @apiError (Unauthorize 401) unauthorize only authorize users can access the data
    * @apiError (Forbidden 403)   only admin can access the data
    */
   .get(verifyToken, singleProductController)
   /**
-   * @api {post} /tools save a tools
-   * @apiDescription post all the tools
-   * @apiPermission admin
+   * @api {post} /:id
+   * @apiDescription update product quantity api
+   * @apiPermission auth user only
    *
    * @apiHeader {String} Authorization user's access token
    *
@@ -57,7 +57,7 @@ router
    * @apiSuccess
    *
    * @apiError (Unauthorize 401) unauthorize only authorize users can access the data
-   * @apiError (Forbidden 403)   only admin can access the data
+   * @apiError (Forbidden 403)   only auth user can access the data
    */
   // update product quantity api
   //TODO: new add ->  verifyAdmin

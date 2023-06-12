@@ -31,11 +31,11 @@ const {
 
 // * user and admin api
 // user collection api
-router.put("/user/:email", verifyToken,userCollectionController);
+router.put("/user/:email", userCollectionController);
 // find all user api
 router.get("/user", verifyToken, findAllUserController);
 // admin email get api
-router.get("/user/admin/:email", verifyToken, getAdminEmailController);
+router.get("/admin/:email", verifyToken, getAdminEmailController);
 // Make a admin api
 router.put(
   "/user/admin/:email",
@@ -43,7 +43,7 @@ router.put(
   verifyAdmin,
   adminCreateController
 );
-// update and add new admin admin api
+// update user role admin api
 router.put(
   "/deleteAdmin/:email",
   verifyToken,
