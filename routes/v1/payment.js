@@ -2,7 +2,7 @@ const router = require("express").Router();
 const {
   paymentGetWayController,
   orderPaymentUpdateController,
-} = require("../../controller/controller");
+} = require("../../controller/payment");
 const { verifyToken } = require("../../middleware/custom.middleware");
 
 // * payment api

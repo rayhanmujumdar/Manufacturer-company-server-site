@@ -7,7 +7,7 @@ const {
   singleProductController,
   getUpdateQuantityController,
   deleteProductController,
-} = require("../../controller/controller");
+} = require("../../controller/product");
 const {
   verifyAdmin,
   verifyToken,
@@ -15,14 +15,14 @@ const {
 
 router
   .route("/")
+  //get all product api
   .get(getAllProductController)
   // Add a new Product api
   //TODO: previous path -> /addProduct - POST
   .post(verifyToken, newProductController);
 // manage product api
-// TODO: /product or /manageProduct are similar just one different is verifyToken.
+// TODO: /product or /manageProduct are similar just one different is authorization access.
 router.get("/manageProduct", verifyToken, manageProductController);
-//get all product api
 // update product api
 router.put("/updateProduct/:id", verifyToken, updateProductController);
 // find a single product api controller

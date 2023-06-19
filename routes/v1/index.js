@@ -26,4 +26,4 @@ router.use("/api/v1/order", orderRouter);
 router.use("/api/v1/review", reviewRouter);
 router.use("/api/v1/payment", paymentRouter);
 
-return router;
+module.exports = router;

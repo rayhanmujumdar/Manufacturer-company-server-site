@@ -3,13 +3,13 @@ const {
   homeReviewController,
   allReviewsController,
   addReviewsController,
-} = require("../../controller/controller");
+} = require("../../controller/review");
 const { verifyToken } = require("../../middleware/custom.middleware");
 
 // * reviews api
 // home section review collection api
 // TODO: previous path -> /homeReview
-router.get("/home", homeReviewController);
+router.get("/home-review", homeReviewController);
 router
   .route("/")
   // all reviews data api

@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const dbClient = require("../db/db");
-const status = require("../routes/v1/health");
+const routes = require("../routes/v1/index");
 const app = express();
 const globalMiddleware = require("../middleware/global.middleware");
 const { notFoundHandler, errorHandler } = require("../errors/error.route");
@@ -12,7 +12,7 @@ async function databaseConnection() {
     await dbClient.connect();
     console.log("database connect");
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
 }
 databaseConnection();
@@ -21,7 +21,7 @@ databaseConnection();
 app.use(globalMiddleware);
 
 // route middleware
-app.use(status);
+app.use(routes);
 
 // route errors
 app.use(notFoundHandler);
