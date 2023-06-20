@@ -1,15 +1,14 @@
-const dbCollection = require("../db/dbCollection");
-const jwt = require("jsonwebtoken");
 const {
   findAllUserService,
   getAdminEmailService,
   userCollectionService,
   adminUpdateRoleService,
 } = require("../services/user");
+const error = require("../utilits/error");
 const { jwtTokenGenerator } = require("../utilits/jwtTokenGenerator");
 
 // find a all users controller
-exports.findAllUserController = async (req, res) => {
+exports.findAllUserController = async (req, res, next) => {
   try {
     const email = req.query.email;
     const decoded = req.decoded.email;
@@ -17,15 +16,15 @@ exports.findAllUserController = async (req, res) => {
       const result = (await findAllUserService()).reverse();
       res.json(result);
     } else {
-      res.status(403).json({ message: "forbidden" });
+      next(error(403, "forbidden"));
     }
   } catch (err) {
-    console.log(err);
+    next(error(500, err.message));
   }
 };
 
 // admin email get api controller
-exports.getAdminEmailController = async (req, res) => {
+exports.getAdminEmailController = async (req, res, next) => {
   try {
     const email = req.params.email;
     const decoded = req.decoded.email;
@@ -34,15 +33,15 @@ exports.getAdminEmailController = async (req, res) => {
       const isAdmin = user?.role === "admin";
       res.json({ admin: isAdmin });
     } else {
-      res.status(403).json({ message: "forbidden" });
+      next(error(403, "forbidden"));
     }
   } catch (err) {
-    console.log(err);
+    next(error(err.status, err.message));
   }
 };
 
 // user collection api controller
-exports.userCollectionController = async (req, res) => {
+exports.userCollectionController = async (req, res, next) => {
   try {
     const email = req.params.email;
     const user = req.body;
@@ -53,12 +52,12 @@ exports.userCollectionController = async (req, res) => {
       result,
     });
   } catch (err) {
-    console.log(err);
+    next(error(err.status, err.message));
   }
 };
 
 // Make a admin api
-exports.adminCreateController = async (req, res) => {
+exports.adminCreateController = async (req, res, next) => {
   try {
     const filterMail = req.params.email;
     const decoded = req.decoded.email;
@@ -70,15 +69,15 @@ exports.adminCreateController = async (req, res) => {
       });
       res.json(result);
     } else {
-      res.status(403).json({ message: "forbidden" });
+      next(error(403, "forbidden"));
     }
   } catch (err) {
-    console.log(err);
+    next(error(err.status, err.message));
   }
 };
 
 // deleted admin api
-exports.deleteAdminController = async (req, res) => {
+exports.deleteAdminController = async (req, res, next) => {
   try {
     const filterMail = req.params.email;
     const authEmail = req.body.email;
@@ -90,9 +89,9 @@ exports.deleteAdminController = async (req, res) => {
       });
       res.json(result);
     } else {
-      res.status(403).json({ message: "forbidden" });
+      next(error(403, "forbidden"));
     }
   } catch (err) {
-    console.log(err)
+    next(error(err.status, err.message));
   }
 };
