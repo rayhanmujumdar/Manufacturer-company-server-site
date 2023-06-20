@@ -1,96 +1,98 @@
 const dbCollection = require("../db/dbCollection");
 const jwt = require("jsonwebtoken");
+const {
+  findAllUserService,
+  getAdminEmailService,
+  userCollectionService,
+  adminUpdateRoleService,
+} = require("../services/user");
+const { jwtTokenGenerator } = require("../utilits/jwtTokenGenerator");
 
-// find a all users api controller
+// find a all users controller
 exports.findAllUserController = async (req, res) => {
-  const { userCollection } = await dbCollection();
-  const email = req.query.email;
-  const decoded = req.decoded.email;
-  if (email === decoded) {
-    const result = (await userCollection.find({}).toArray()).reverse();
-    res.send(result);
-  } else {
-    res.status(403).send({ message: "forbidden" });
+  try {
+    const email = req.query.email;
+    const decoded = req.decoded.email;
+    if (email === decoded) {
+      const result = (await findAllUserService()).reverse();
+      res.json(result);
+    } else {
+      res.status(403).json({ message: "forbidden" });
+    }
+  } catch (err) {
+    console.log(err);
   }
 };
 
-// admin email get api
+// admin email get api controller
 exports.getAdminEmailController = async (req, res) => {
-  const { userCollection } = await dbCollection();
-  const email = req.params.email;
-  const decoded = req.decoded.email;
-  if (email === decoded) {
-    const user = await userCollection.findOne({ email: email });
-    const isAdmin = user?.role === "admin";
-    res.send({ admin: isAdmin });
-  } else {
-    res.status(403).send({ message: "forbidden" });
+  try {
+    const email = req.params.email;
+    const decoded = req.decoded.email;
+    if (email === decoded) {
+      const user = await getAdminEmailService(email);
+      const isAdmin = user?.role === "admin";
+      res.json({ admin: isAdmin });
+    } else {
+      res.status(403).json({ message: "forbidden" });
+    }
+  } catch (err) {
+    console.log(err);
   }
 };
 
 // user collection api controller
 exports.userCollectionController = async (req, res) => {
-  const { userCollection } = await dbCollection();
-  const email = req.params.email;
-  const user = req.body;
-  const filter = {
-    email: email,
-  };
-  const updateDoc = {
-    $set: user,
-  };
-  const options = {
-    upsert: true,
-  };
-  const result = await userCollection.updateOne(filter, updateDoc, options);
-  const token = jwt.sign(
-    {
-      email: email,
-    },
-    process.env.TOKEN_SECRET,
-    {
-      expiresIn: "1d",
-    }
-  );
-  res.send({
-    token,
-    result,
-  });
+  try {
+    const email = req.params.email;
+    const user = req.body;
+    const result = await userCollectionService({ email, user });
+    const token = jwtTokenGenerator(email);
+    res.json({
+      token,
+      result,
+    });
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 // Make a admin api
 exports.adminCreateController = async (req, res) => {
-  const { userCollection } = await dbCollection();
-  const makeAdminEmail = req.params.email;
-  const decoded = req.decoded.email;
-  const email = req.body.email;
-  if (email === decoded) {
-    const filter = { email: makeAdminEmail };
-    const updateDoc = {
-      $set: { role: "admin" },
-    };
-    const result = await userCollection.updateOne(filter, updateDoc);
-    res.send(result);
-  } else {
-    res.status(403).send({ message: "forbidden" });
+  try {
+    const filterMail = req.params.email;
+    const decoded = req.decoded.email;
+    const userEmail = req.body.email;
+    if (userEmail === decoded) {
+      const result = await adminUpdateRoleService({
+        email: filterMail,
+        role: "admin",
+      });
+      res.json(result);
+    } else {
+      res.status(403).json({ message: "forbidden" });
+    }
+  } catch (err) {
+    console.log(err);
   }
 };
 
 // deleted admin api
 exports.deleteAdminController = async (req, res) => {
-  const { userCollection } = await dbCollection();
-  const authEmail = req.body.email;
-  const decoded = req.decoded.email;
-  if (authEmail === decoded) {
-    const email = req.params.email;
-    const filter = { email: email };
-    const updateDoc = {
-      $set: { role: null },
-    };
-    const result = await userCollection.updateOne(filter, updateDoc);
-    console.log(result)
-    res.send(result);
-  } else {
-    res.status(403).send({ message: "forbidden" });
+  try {
+    const filterMail = req.params.email;
+    const authEmail = req.body.email;
+    const decoded = req.decoded.email;
+    if (authEmail === decoded) {
+      const result = await adminUpdateRoleService({
+        email: filterMail,
+        role: null,
+      });
+      res.json(result);
+    } else {
+      res.status(403).json({ message: "forbidden" });
+    }
+  } catch (err) {
+    console.log(err)
   }
 };
