@@ -1,5 +1,5 @@
 const sendOrderMail = (order) => {
-  const { email, name, cost, img, address, product, orderQuantity } = order;
+  const { email, name, cost, address, product, orderQuantity } = order;
   const mailOptions = {
     from: "rayhanmujumdar0177@gmail.com",
     to: email,

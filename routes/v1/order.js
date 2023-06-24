@@ -3,7 +3,7 @@ const {
   allOrderCollectionController,
   getSingleOrderController,
   shippingOrdersController,
-  deleteProductController,
+  deleteOrderController,
   getOrderProductController,
 } = require("../../controller/order");
 const { verifyToken, verifyAdmin } = require("../../middleware/custom.middleware");
@@ -25,6 +25,6 @@ router
   .patch(verifyToken, verifyAdmin, shippingOrdersController)
   //TODO: previous path -> /deleteOrder/:id
   // delete product order api
-  .delete(verifyToken, deleteProductController);
+  .delete(verifyToken, deleteOrderController);
 
 module.exports = router;

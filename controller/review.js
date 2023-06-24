@@ -1,4 +1,3 @@
-const dbCollection = require("../db/dbCollection");
 const { getReviewsService, addReviewService } = require("../services/review");
 const error = require("../utilits/error");
 
@@ -10,7 +9,7 @@ exports.homeReviewController = async (req, res, next) => {
     res.json(result);
   } catch (err) {
     console.log(err);
-    next(error(err.status, err.message));
+    next(error(500, 'Internal server error'));
   }
 };
 
@@ -21,7 +20,7 @@ exports.allReviewsController = async (req, res, next) => {
     const result = await getReviewsService(query)("createAt")(0);
     res.json(result);
   } catch (err) {
-    next(error(err.status, err.message));
+    next(error(500, "Internal server error"));
   }
 };
 
@@ -38,6 +37,6 @@ exports.addReviewsController = async (req, res, next) => {
       next(error(403, "forbidden"));
     }
   } catch (err) {
-    next(error(err.status, err.message));
+    next(error(500, "Internal server error"));
   }
 };

@@ -19,7 +19,7 @@ exports.findAllUserController = async (req, res, next) => {
       next(error(403, "forbidden"));
     }
   } catch (err) {
-    next(error(500, err.message));
+    next(error(500, "Internal server error"));
   }
 };
 
@@ -36,7 +36,7 @@ exports.getAdminEmailController = async (req, res, next) => {
       next(error(403, "forbidden"));
     }
   } catch (err) {
-    next(error(err.status, err.message));
+    next(error(500, "Internal server error"));
   }
 };
 
@@ -52,7 +52,7 @@ exports.userCollectionController = async (req, res, next) => {
       result,
     });
   } catch (err) {
-    next(error(err.status, err.message));
+    next(error(500, "Internal server error"));
   }
 };
 
@@ -72,7 +72,7 @@ exports.adminCreateController = async (req, res, next) => {
       next(error(403, "forbidden"));
     }
   } catch (err) {
-    next(error(err.status, err.message));
+    next(error(500, "Internal server error"));
   }
 };
 
@@ -92,6 +92,6 @@ exports.deleteAdminController = async (req, res, next) => {
       next(error(403, "forbidden"));
     }
   } catch (err) {
-    next(error(err.status, err.message));
+    next(error(500, "Internal server error"));
   }
 };

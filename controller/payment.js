@@ -1,34 +1,38 @@
-const { ObjectId } = require("mongodb");
-const dbCollection = require("../db/dbCollection");
-
-const stripe = require("stripe")(process.env.PAYMENT_SECRET_KEY);
+const error = require("../utilits/error");
+const {
+  paymentGetWayService,
+  addNewPaymentInfoService,
+  orderPaymentUpdateService,
+} = require("../services/payment");
 // Stripe Payment gat way
-exports.paymentGetWayController = async (req, res) => {
-  const { price } = req.body;
-  const amount = price * 100;
-  const paymentIntent = await stripe?.paymentIntents.create({
-    amount: amount,
-    currency: "usd",
-    payment_method_types: ["card"],
-  });
-  res.send({
-    clientSecret: paymentIntent.client_secret,
-  });
+exports.paymentGetWayController = async (req, res, next) => {
+  try {
+    const { price } = req.body;
+    const paymentIntent = await paymentGetWayService({
+      price: price * 100,
+      currency: "usd",
+      method: ["card"],
+    });
+    res.json({
+      clientSecret: paymentIntent.client_secret,
+    });
+  } catch {
+    next(error(500, "Internal server error"));
+  }
 };
 
 // order payment update
-exports.orderPaymentUpdateController = async (req, res) => {
-  const { orderCollection, paymentCollection } = await dbCollection();
-  const id = req.params.id;
-  const payment = req.body;
-  const filter = { _id: ObjectId(id) };
-  const updateDoc = {
-    $set: {
-      paid: true,
-      transactionId: payment?.transactionId,
-    },
-  };
-  await paymentCollection.insertOne(payment);
-  const updateOrder = await orderCollection.updateOne(filter, updateDoc);
-  res.send(updateOrder);
+exports.orderPaymentUpdateController = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const paymentInfo = req.body;
+    await addNewPaymentInfoService({ ...paymentInfo, createAt: Date.now() });
+    const result = await orderPaymentUpdateService({
+      id,
+      transactionId: paymentInfo.transactionId,
+    });
+    res.json(result);
+  } catch {
+    next(error(500, "Internal server error"));
+  }
 };

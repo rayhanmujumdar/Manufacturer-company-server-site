@@ -1,66 +1,70 @@
-const { ObjectId } = require("mongodb");
-const dbCollection = require("../db/dbCollection");
-const nodemailerTransporter = require("../utilits/nodemailer");
-const sendOrderMail = require("../utilits/sendOrderMail");
+const error = require("../utilits/error");
+const {
+  allOrderCollectionService,
+  getOrderProductService,
+  sendPurchaseMailService,
+  getSingleOrderService,
+  shippingOrdersService,
+  deleteOrderService,
+} = require("../services/order");
 
 // dashboard all orders api
-exports.allOrderCollectionController = async (req, res) => {
-  const { orderCollection } = await dbCollection();
-  const query = req.query;
-  const result = (await orderCollection.find(query).toArray()).reverse();
-  res.send(result);
+exports.allOrderCollectionController = async (req, res, next) => {
+  try {
+    const query = req.query;
+    const result = await allOrderCollectionService(query)(query?.sort);
+    res.json(result);
+  } catch {
+    next(error(500, "Internal server error"));
+  }
 };
 // get all ordered product
-exports.getOrderProductController = async (req, res) => {
+exports.getOrderProductController = async (req, res, next) => {
   try {
-    const { orderCollection } = await dbCollection();
     const orderData = req.body;
-    const result = await orderCollection.insertOne(orderData);
+    const result = await getOrderProductService(orderData);
     // send order mail function
     if (result?.acknowledged) {
-      const mailOptions = sendOrderMail(orderData);
-      const transporter = nodemailerTransporter();
-      transporter.sendMail(mailOptions, (err, info) => {
-        if (err) {
-          console.log(err);
-        } else {
-          // console.log(info);
-        }
-      });
+      sendPurchaseMailService(orderData);
     }
-    res.send(result);
+    res.json(result);
   } catch (err) {
-    // console.log(err.message);
+    next(error(500, "Internal server error"));
   }
 };
 
 // ordered single data api
-exports.getSingleOrderController = async (req, res) => {
-  const { orderCollection } = await dbCollection();
-  const id = req.params.id;
-  const filter = { _id: ObjectId(id) };
-  const result = await orderCollection.findOne(filter);
-  res.send(result);
+exports.getSingleOrderController = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const result = await getSingleOrderService(id);
+    res.json(result);
+  } catch {
+    next(error(500, "Internal server error"));
+  }
 };
 
 // shipping orders api
 exports.shippingOrdersController = async (req, res) => {
-  const { orderCollection } = await dbCollection();
-  const id = req?.params?.id;
-  const filter = { _id: ObjectId(id) };
-  const updateDoc = {
-    $set: { delivery: true },
-  };
-  const result = await orderCollection.updateOne(filter, updateDoc);
-  res.send(result);
+  try {
+    const id = req?.params?.id;
+    const result = await shippingOrdersService({
+      id,
+      order: { delivery: true },
+    });
+    res.json(result);
+  } catch {
+    next(error(500, "Internal server error"));
+  }
 };
 
 // delete product api
-exports.deleteProductController = async (req, res) => {
-  const { orderCollection } = await dbCollection();
-  const id = req.params.id;
-  const query = { _id: ObjectId(id) };
-  const result = await orderCollection.deleteOne(query);
-  console.log(result);
-  res.send(result);
+exports.deleteOrderController = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const result = await deleteOrderService(id);
+    res.json(result);
+  } catch {
+    next(error(500, "Internal server error"));
+  }
 };
