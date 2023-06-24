@@ -4,7 +4,7 @@ const sendOrderMail = (order) => {
     from: "rayhanmujumdar0177@gmail.com",
     to: email,
     subject: `Buy Product Confirmation from Computer Market`,
-    text: "This is a test email sent with Nodemailer and Brevo SMTP.",
+    text: "",
     html: `<!DOCTYPE html>
     <html>
     

@@ -3,13 +3,15 @@ const {
   paymentGetWayService,
   addNewPaymentInfoService,
   orderPaymentUpdateService,
+  sendPaymentMailService,
 } = require("../services/payment");
+const { getSingleOrderService } = require("../services/order");
 // Stripe Payment gat way
 exports.paymentGetWayController = async (req, res, next) => {
   try {
     const { price } = req.body;
     const paymentIntent = await paymentGetWayService({
-      price: price * 100,
+      price: price,
       currency: "usd",
       method: ["card"],
     });
@@ -27,9 +29,11 @@ exports.orderPaymentUpdateController = async (req, res, next) => {
     const id = req.params.id;
     const paymentInfo = req.body;
     await addNewPaymentInfoService({ ...paymentInfo, createAt: Date.now() });
+    const orderInfo = await getSingleOrderService(id);
+    sendPaymentMailService({orderInfo,paymentInfo}); // Payment confirmation mail send to client
     const result = await orderPaymentUpdateService({
       id,
-      transactionId: paymentInfo.transactionId,
+      transactionId: paymentInfo?.transactionId,
     });
     res.json(result);
   } catch {
