@@ -5,11 +5,13 @@ const error = require("../utilits/error");
 exports.homeReviewController = async (req, res, next) => {
   try {
     const query = req.query;
-    const result = await getReviewsService(query)("createAt")(3);
-    res.json(result);
+    const { data, count } = await getReviewsService(query)(query?.sort);
+    res.append("Access-Control-Expose-Headers", "X-Total-Count");
+    res.setHeader("X-Total-Count", `${count}`);
+    res.json(data);
   } catch (err) {
     console.log(err);
-    next(error(500, 'Internal server error'));
+    next(error(500, "Internal server error"));
   }
 };
 
@@ -17,9 +19,12 @@ exports.homeReviewController = async (req, res, next) => {
 exports.allReviewsController = async (req, res, next) => {
   try {
     const query = req.query;
-    const result = await getReviewsService(query)("createAt")(0);
-    res.json(result);
+    const { data, count } = await getReviewsService(query)(query?.sort);
+    res.append("Access-Control-Expose-Headers", "X-Total-Count");
+    res.setHeader("X-Total-Count", `${count}`);
+    res.json(data);
   } catch (err) {
+    console.log(err)
     next(error(500, "Internal server error"));
   }
 };

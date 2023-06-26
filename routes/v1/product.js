@@ -22,9 +22,9 @@ router
   .post(verifyToken, newProductController);
 // manage product api
 // TODO: /product or /manageProduct are similar just one different is authorization access.
-router.get("/manageProduct", verifyToken, manageProductController);
+router.get("/manageProduct", verifyToken,verifyAdmin, manageProductController);
 // update product api
-router.put("/updateProduct/:id", verifyToken, updateProductController);
+router.put("/updateProduct/:id", verifyToken,verifyAdmin, updateProductController);
 // find a single product api controller
 router
   .route("/:id")
