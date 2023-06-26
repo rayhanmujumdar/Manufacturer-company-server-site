@@ -15,7 +15,8 @@ exports.getAllProductController = async (req, res, next) => {
     res.append("Access-Control-Expose-Headers", "X-Total-Count");
     res.setHeader("X-Total-Count", `${count}`);
     res.json(product);
-  } catch {
+  } catch{
+    
     next(error(500, "Internal server error"));
   }
 };
@@ -51,7 +52,8 @@ exports.manageProductController = async (req, res, next) => {
     } else {
       next(error(500, "forbidden"));
     }
-  } catch {
+  } catch{
+    
     next(error(500, "Internal server error"));
   }
 };

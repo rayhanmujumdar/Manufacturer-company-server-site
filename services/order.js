@@ -16,12 +16,14 @@ exports.allOrderCollectionService =
         ? { [property]: search }
         : { name: search }
       : {};
-    return orderCollection
+      const count = await orderCollection.countDocuments()
+      const data = await orderCollection
       .find(filter)
       .sort({ [sort]: sortOrder })
       .skip(pageNum * limitNum)
       .limit(limitNum)
-      .toArray();
+      .toArray()
+    return {data,count};
   };
 
 exports.sendPurchaseMailService = async (order) => {

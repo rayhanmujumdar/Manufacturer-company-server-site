@@ -12,9 +12,12 @@ const {
 exports.allOrderCollectionController = async (req, res, next) => {
   try {
     const query = req.query;
-    const result = await allOrderCollectionService(query)(query?.sort);
-    res.json(result);
-  } catch {
+    const { count, data } = await allOrderCollectionService(query)(query?.sort);
+    res.append("Access-Control-Expose-Headers", "X-Total-Count");
+    res.setHeader("X-Total-Count", `${count}`);
+    res.json(data);
+  } catch (err){
+    console.log(err)
     next(error(500, "Internal server error"));
   }
 };
