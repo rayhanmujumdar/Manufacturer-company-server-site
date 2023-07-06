@@ -7,6 +7,10 @@ const {
   shippingOrdersService,
   deleteOrderService,
 } = require("../services/order");
+const {
+  updateProductService,
+  singleProductService,
+} = require("../services/product");
 
 // dashboard all orders api
 exports.allOrderCollectionController = async (req, res, next) => {
@@ -16,8 +20,8 @@ exports.allOrderCollectionController = async (req, res, next) => {
     res.append("Access-Control-Expose-Headers", "X-Total-Count");
     res.setHeader("X-Total-Count", `${count}`);
     res.json(data);
-  } catch (err){
-    console.log(err)
+  } catch (err) {
+    console.log(err);
     next(error(500, "Internal server error"));
   }
 };
@@ -48,7 +52,7 @@ exports.getSingleOrderController = async (req, res, next) => {
 };
 
 // shipping orders api
-exports.shippingOrdersController = async (req, res) => {
+exports.shippingOrdersController = async (req, res, next) => {
   try {
     const id = req?.params?.id;
     const result = await shippingOrdersService({
@@ -62,11 +66,22 @@ exports.shippingOrdersController = async (req, res) => {
 };
 
 // delete product api
-exports.deleteOrderController = async (req, res) => {
+exports.deleteOrderController = async (req, res, next) => {
   try {
     const id = req.params.id;
+    const { orderQuantity, productId } = req.query || {};
     const result = await deleteOrderService(id);
-    res.json(result);
+    res.status(200).json(result);
+    const product = await singleProductService(productId);
+    if (result.deletedCount > 0 && product) {
+      await updateProductService({
+        id: productId,
+        product: {
+          availableQuantity:
+            product.availableQuantity + Number(orderQuantity),
+        },
+      });
+    }
   } catch {
     next(error(500, "Internal server error"));
   }
