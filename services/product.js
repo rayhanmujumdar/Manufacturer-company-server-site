@@ -32,10 +32,7 @@ exports.updateProductService = async ({ id, product }) => {
     upsert: true,
   };
   const updateDoc = {
-    $set: product,
-    $currentDate: {
-      fieldToPreserve: true,
-    },
+    $set: product
   };
   return productCollection.updateOne(filter, updateDoc, options);
 };

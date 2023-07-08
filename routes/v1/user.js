@@ -23,6 +23,11 @@ router.put("/:email", userCollectionController);
 router.put("/admin/:email", verifyToken, verifyAdmin, adminCreateController);
 // update and add new admin route
 // TODO: previous path -> /deleteAdmin/:email
-router.put("/admin/change/:email", verifyToken, verifyAdmin, deleteAdminController);
+router.put(
+  "/admin/change/:email",
+  verifyToken,
+  verifyAdmin,
+  deleteAdminController
+);
 
 module.exports = router;

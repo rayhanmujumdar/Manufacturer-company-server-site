@@ -5,7 +5,7 @@ const {
   getAllProductController,
   updateProductController,
   singleProductController,
-  getUpdateQuantityController,
+  UpdateQuantityController,
   deleteProductController,
 } = require("../../controller/product");
 const {
@@ -61,7 +61,7 @@ router
    */
   // update product quantity api
   //TODO: new add ->  verifyAdmin
-  .put(verifyToken, getUpdateQuantityController)
+  .put(verifyToken, UpdateQuantityController)
   // delete product api
   .delete(verifyToken, verifyAdmin, deleteProductController);
 
