@@ -5,15 +5,15 @@ const notFoundHandler = (_req, _res, next) => {
 };
 
 const errorHandler = (error, _req, res, _next) => {
-  console.log(error.status);
   if (error.status) {
     return res.status(error.status).json({
       message: error.message,
     });
+  }else {
+    return res.status(500).json({
+      message: "something was wrong",
+    });
   }
-  return res.status(500).json({
-    message: "something was wrong",
-  });
 };
 
 module.exports = {

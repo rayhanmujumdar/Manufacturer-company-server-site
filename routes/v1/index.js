@@ -21,7 +21,6 @@ router.get("/health", (_req, res) => {
 
 router.use("/api/v1/user", userRouter);
 router.use("/api/v1/product", productRouter);
-// TODO: previous path -> api/v1/tools/orders
 router.use("/api/v1/order", orderRouter);
 router.use("/api/v1/review", reviewRouter);
 router.use("/api/v1/payment", paymentRouter);
